@@ -1,20 +1,12 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
 import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
-import {
-  deleteGoogleMail,
-  getMessagesAndContent,
-  markAsRead,
-} from '@/app/(auth)/google/_auth/options'
-import { GoogleAccount, mailDatas } from '@/app/(auth)/google/_auth/types'
-
+import { deleteGoogleMail, getMessagesAndContent } from './auth/google/options'
+import { GoogleAccount, mailDatas } from './auth/google/types'
 import CopyMail from './copy'
 import Spinner from './spiner'
-import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 
 type Props = {
@@ -22,6 +14,7 @@ type Props = {
 }
 
 export default function Gmail({ accountData }: Props) {
+  console.log('ACC', accountData)
   const [selectedMessage, setSelectedMessage] = useState<any>()
   const [mailDatas, setMailDatas] = useState<mailDatas[]>([])
 
@@ -50,32 +43,34 @@ export default function Gmail({ accountData }: Props) {
       }
       return lastPage.nextPageToken
     },
-    initialPageParam: undefined,
+    initialPageParam: 1,
     enabled: !!accountData,
     refetchOnWindowFocus: false,
     retry: 2,
   })
+  // console.log('MAILDATA', mailData)
 
+  console.log('<><><><><<<<', mailDatas.length)
   useEffect(() => {
     if (mailData) {
       setMailDatas(mailData.pages.flatMap(page => page?.messagesData))
     }
   }, [mailData])
 
-  const { mutate } = useMutation({
-    mutationKey: ['read'],
-    mutationFn: ({ messId }: { messId: string }) =>
-      markAsRead(accountData?.accessToken, accountData?.refreshToken, messId),
-    onSuccess: (data, variables) => {
-      const updatedMailDatas = mailDatas.map(mess =>
-        mess.messageId === variables.messId ? { ...mess, isUnread: false } : mess,
-      )
-      setMailDatas(updatedMailDatas)
-    },
-  })
+  // const { mutate } = useMutation({
+  //   mutationKey: ['read'],
+  //   mutationFn: ({ messId }: { messId: string }) =>
+  //     markAsRead(accountData?.accessToken, accountData?.refreshToken, messId),
+  //   onSuccess: (data, variables) => {
+  //     const updatedMailDatas = mailDatas.map(mess =>
+  //       mess?.messageId === variables.messId ? { ...mess, isUnread: false } : mess,
+  //     )
+  //     setMailDatas(updatedMailDatas)
+  //   },
+  // })
 
   const chooseMessage = (data: Partial<mailDatas>) => {
-    mutate({ messId: data.messageId })
+    // mutate({ messId: data?.messageId })
     setSelectedMessage(data!)
   }
 
@@ -86,9 +81,9 @@ export default function Gmail({ accountData }: Props) {
     }
   }, [inView])
 
-  if (isPending) {
-    return <Spinner />
-  }
+  // if (isPending) {
+  //   return <Spinner />
+  // }
 
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-background pt-[6.8vh]">
@@ -113,7 +108,7 @@ export default function Gmail({ accountData }: Props) {
               <div
                 ref={ref}
                 key={`${mess.snippet} + ${i}`}
-                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-slate-500/25 ${selectedMessage?.messageId == mess.messageId ? 'bg-slate-500/25' : ''}`}
+                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-slate-500/25 ${selectedMessage?.messageId == mess?.messageId ? 'bg-slate-500/25' : ''}`}
                 onClick={() => chooseMessage(mess)}
               >
                 <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">

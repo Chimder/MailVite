@@ -1,11 +1,11 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import axios from 'axios'
+import { redirect } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
-import { decrypt, encrypt } from '../../google/_auth/options'
+import { decrypt, encrypt } from '../google/options'
 import { TempAccount, TempMess } from './types'
 
 export async function getTempSession(): Promise<TempAccount[] | null> {
@@ -71,8 +71,11 @@ export async function regTempEmailAccount() {
 export async function deleteTempMail(email: string) {
   cookies().delete(`tempmail_${email}`)
   const activeAccount = await getTempSession()
-  if (!activeAccount) redirect('/')
-  redirect(`/temp/${activeAccount[0].email}`)
+  if (!activeAccount) {
+    redirect('/')
+  } else {
+    redirect(`/temp/${activeAccount[0].email}`)
+  }
 }
 
 export async function getTempMessages(token: string, page: string): Promise<TempMess | undefined> {

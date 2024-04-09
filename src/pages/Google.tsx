@@ -1,20 +1,26 @@
-import React from "react";
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
 
-import Gmail from "@/components/Gmail";
-import { getGmailSession } from "@/app/(auth)/google/_auth/options";
+import { getGmailSession } from '@/components/auth/google/options'
+import Gmail from '@/components/Gmail'
 
-export default async function Email({ params }: { params: { email: string } }) {
-  const mail = decodeURIComponent(params?.email);
-  const session = await getGmailSession();
-  const gmailAccount = session?.find((acc) => acc?.email === mail);
+export default function Google() {
+  const param = useParams()
+
+  const { data: googleSession } = useQuery({
+    queryKey: ['google'],
+    queryFn: () => getGmailSession(),
+  })
+  const gmailAccount = googleSession?.find(acc => acc?.email === param.mail)
 
   if (!gmailAccount) {
-    return <>gmail Not Found</>;
+    return <>gmail Not Found</>
   }
 
   return (
     <section className="overflow-y-hidden">
       {gmailAccount && <Gmail accountData={gmailAccount} />}
     </section>
-  );
+  )
 }

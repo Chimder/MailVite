@@ -91,10 +91,9 @@
   filter: drop-shadow(rgba(56, 237, 172, 0.6) 10px 0px 15px)
     drop-shadow(rgba(150, 162, 255, 0.6) -10px 0px 15px);
   border: 1px solid transparent;
-  background: linear-gradient(var(--nav-bg), var(--nav-bg)) padding-box
-      padding-box,
-    linear-gradient(90deg, rgb(32, 28, 255) -91.5%, rgb(19, 239, 149) 80.05%)
-      border-box border-box;
+  background:
+    linear-gradient(var(--nav-bg), var(--nav-bg)) padding-box padding-box,
+    linear-gradient(90deg, rgb(32, 28, 255) -91.5%, rgb(19, 239, 149) 80.05%) border-box border-box;
 }
 
 @layer base {
@@ -111,7 +110,7 @@
     @apply px-[10vw] xl:px-[3vw] lg:px-0;
   }
   .nav_bar_container {
-    @apply bg-backgroundNav fixed  left-1/2 top-8 z-999 flex h-full max-h-[54px] w-full max-w-[780px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full p-2 text-lg;
+    @apply fixed left-1/2  top-8 z-999 flex h-full max-h-[54px] w-full max-w-[780px] -translate-x-1/2 -translate-y-1/2 transform items-center rounded-full bg-backgroundNav p-2 text-lg;
   }
   .nav_icon {
     @apply flex cursor-pointer items-center justify-center rounded-lg px-2.5 py-[1px]  transition-colors  hover:bg-secondary;

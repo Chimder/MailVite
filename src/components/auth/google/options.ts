@@ -1,15 +1,16 @@
-'use server'
-
-import { cookies } from 'next/headers'
-import { formatDate } from '@/shared/lib/data-format'
-import { google } from 'googleapis'
+import axios, { AxiosError } from 'axios'
 import { jwtVerify, SignJWT } from 'jose'
+import { Base64 } from 'js-base64'
+import Cookies from 'js-cookie'
+import { redirect } from 'react-router-dom'
 
+import { formatDate } from '../../../shared/lib/data-format'
 import { GoogleAccount } from './types'
-import { redirect } from 'next/navigation'
 
-const secretKey = process.env.NEXT_AUTH_SECRET
+const secretKey = import.meta.env.VITE_SECRET
 const key = new TextEncoder().encode(secretKey)
+const redirect_uri = `${import.meta.env.VITE_URL}/google/auth/callback`
+export const GoogleLoginURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=code&scope=openid%20profile%20email%20https://www.googleapis.com/auth/gmail.modify&access_type=offline&prompt=consent`
 
 export async function encrypt(payload: any) {
   return await new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().sign(key)
@@ -26,15 +27,63 @@ export async function decrypt(input: string): Promise<any> {
     })
     return payload
   } catch (error) {
-    console.error('Error during decryption:', error);
-    return undefined;
+    console.error('Error during decryption:', error)
+    return undefined
   }
 }
+
 export async function deleteGoogleMail(email: string) {
-  cookies().delete(`googleMailer_${email}`)
+  Cookies.remove(`googleMailer_${email}`)
   const activeAccount = await getGmailSession()
-  if (!activeAccount) redirect('/')
-  redirect(`/google/${activeAccount[0].email}`)
+  if (!activeAccount) {
+    redirect('/')
+  } else {
+    redirect(`/google/${activeAccount[0].email}`)
+  }
+}
+export async function getGmailSession(): Promise<GoogleAccount[] | null> {
+  const cookiesAll = Cookies.get()
+  const tempAccounts = Object.keys(cookiesAll)
+    .filter(cookieName => cookieName.startsWith('googleMailer_'))
+    .map(cookieName => cookiesAll[cookieName])
+  const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie)))
+  return accounts
+}
+
+async function makeAuthenticatedRequest(url: string, accessToken: string, refreshToken: string) {
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+      },
+    })
+    return { data: response.data, accessToken }
+  } catch (error) {
+    const axiosError = error as AxiosError
+    if (axiosError?.response?.status === 401) {
+      // Токен истек, попробуем обновить его
+      const refreshResponse = await axios.post('https://oauth2.googleapis.com/token', {
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token',
+      })
+
+      accessToken = refreshResponse.data.access_token
+
+      // Повторите запрос с новым токеном доступа
+      const retryResponse = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+        },
+      })
+      return { data: retryResponse.data, accessToken }
+    } else {
+      throw error
+    }
+  }
 }
 
 export async function getMessagesAndContent(
@@ -46,21 +95,17 @@ export async function getMessagesAndContent(
     throw new Error('Account not found')
   }
 
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-  )
-  oauth2Client.setCredentials({
-    access_token: accessToken,
-    refresh_token: refreshToken,
-  })
+  const url = `https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=100&pageToken=${pageToken}`
 
-  const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
-  const { data } = await gmail.users.messages.list({
-    userId: 'me',
-    maxResults: 100,
-    pageToken: pageToken?.toString(),
-  })
+  // const data = await makeAuthenticatedRequest(url, accessToken, refreshToken)
+  const { data, accessToken: updatedAccessToken } = await makeAuthenticatedRequest(
+    url,
+    accessToken,
+    refreshToken,
+  )
+
+  // const data = response.data
+  console.log('RESSSSSSSSSSSSSS', data)
 
   const nextPageToken = data.nextPageToken
 
@@ -70,84 +115,105 @@ export async function getMessagesAndContent(
 
   const messages = await Promise.allSettled(
     data.messages.map(async (message: any) => {
-      const fullMessage = await gmail.users?.messages.get({ userId: 'me', id: message.id })
-      return fullMessage
+      const messageUrl = `https://www.googleapis.com/gmail/v1/users/me/messages/${message.id}?format=full`
+      const messageResponse = await axios.get(messageUrl, {
+        headers: {
+          Authorization: `Bearer ${updatedAccessToken}`,
+          Accept: 'application/json',
+        },
+      })
+      return messageResponse.data
     }),
   )
 
-  const messagesData = messages.map((message: any) => {
-    const headers = message.value?.data?.payload?.headers
-    const subjectHeader = headers.find((header: any) => header.name === 'Subject')
-    const fromHeader = headers.find((header: any) => header.name === 'From')
-    const toHeader = headers.find((header: any) => header.name === 'To')
-    const messageId = message.value?.data?.id
-    const dateHeader = headers.find((header: any) => header.name === 'Date')
+  const messagesData = messages
+    .map((message: any, i: number) => {
+      if (message.status === 'fulfilled') {
+        const payload = message.value?.payload
+        const headers = payload?.headers
+        if (headers) {
+          const subjectHeader = headers.find((header: any) => header.name === 'Subject')
+          const fromHeader = headers.find((header: any) => header.name === 'From')
+          const toHeader = headers.find((header: any) => header.name === 'To')
+          const dateHeader = headers.find((header: any) => header.name === 'Date')
 
-    const subject = subjectHeader ? subjectHeader.value : ''
-    const to = toHeader ? toHeader.value : ''
-    const snippet = message.value?.data?.snippet
-    const isUnread = message.value?.data?.labelIds.includes('UNREAD')
+          const subject = subjectHeader ? subjectHeader.value : ''
+          const from = fromHeader ? extractName(fromHeader.value) : ''
+          const to = toHeader ? toHeader.value : ''
+          const date = dateHeader ? formatDate(dateHeader.value) : ''
 
-    const from = fromHeader ? extractName(fromHeader.value) : ''
-    const date = dateHeader ? formatDate(dateHeader.value) : ''
+          const messageId = message.value?.id
+          const snippet = message.value?.snippet
+          const isUnread = message.value?.labelIds
+            ? message.value.labelIds.includes('UNREAD')
+            : false
 
-    let isBodyWithParts = false
-    let body
+          let isBodyWithParts = false
+          let body
+          if (payload?.parts) {
+            if (payload.parts.length > 1) {
+              body = payload.parts[1]?.body?.data
+            } else {
+              body = payload.parts[0]?.body?.data
+            }
+          } else {
+            isBodyWithParts = true
+            body = payload?.body?.data
+          }
 
-    if (message.value?.data?.payload?.parts) {
-      if (message.value?.data?.payload?.parts.length > 1) {
-        body = message.value?.data?.payload?.parts[1]?.body?.data
-      } else {
-        body = message.value?.data?.payload?.parts[0]?.body?.data
+          let decodedText = ''
+          if (body) {
+            const base64text = body.replace(/-/g, '+').replace(/_/g, '/')
+            decodedText = Base64.decode(base64text)
+          }
+
+          const bodyData = decodedText
+          return {
+            messageId,
+            subject,
+            from,
+            to,
+            date,
+            snippet,
+            isUnread,
+            isBodyWithParts,
+            bodyData,
+          }
+        }
       }
-    } else {
-      isBodyWithParts = true
-      body = message.value?.data?.payload?.body?.data
-    }
+      return null
+    })
+    .filter(message => message !== null)
 
-    let decodedText = ''
-    if (body) {
-      const base64text = body.replace(/-/g, '+').replace(/_/g, '/')
-      decodedText = Buffer.from(base64text, 'base64').toString('utf8')
-    }
-    const bodyData = decodedText
-    return { messageId, subject, from, to, date, snippet, isUnread, isBodyWithParts, bodyData }
-  })
   return { messagesData, nextPageToken }
-}
-
-export async function getGmailSession(): Promise<GoogleAccount[] | null> {
-  const cookiesAll = cookies()
-  const tempAccounts = cookiesAll.getAll().filter(cookie => cookie.name.startsWith('googleMailer_'))
-  const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie.value)))
-  return accounts
 }
 
 function extractName(from: string) {
   const match = from.match(/(.*)<.*>/)
   return match ? match[1].trim() : from
 }
-export async function markAsRead(accessToken: string, refreshToken: string, messageId: string) {
-  if (!accessToken || !refreshToken) {
-    throw new Error('Account not found')
-  }
 
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-  )
-  oauth2Client.setCredentials({
-    access_token: accessToken,
-    refresh_token: refreshToken,
-  })
+// export async function markAsRead(accessToken: string, refreshToken: string, messageId: string) {
+//   if (!accessToken || !refreshToken) {
+//     throw new Error('Account not found')
+//   }
 
-  const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
+//   const oauth2Client = new google.auth.OAuth2(
+//     import.meta.env.VITE_GOOGLE_CLIENT_ID,
+//     import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+//   )
+//   oauth2Client.setCredentials({
+//     access_token: accessToken,
+//     refresh_token: refreshToken,
+//   })
 
-  await gmail.users.messages.modify({
-    userId: 'me',
-    id: messageId,
-    requestBody: {
-      removeLabelIds: ['UNREAD'],
-    },
-  })
-}
+//   const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
+
+//   await gmail.users.messages.modify({
+//     userId: 'me',
+//     id: messageId,
+//     requestBody: {
+//       removeLabelIds: ['UNREAD'],
+//     },
+//   })
+// }
