@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import Spinner from '../../spiner'
 import { decrypt, encrypt } from './options'
+import { resetGmailSession } from './query'
 import { GoogleAccount } from './types'
 
 const GoogleCallBack = () => {
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       const code = new URL(window.location.href).searchParams.get('code')
-      console.log('CODE', code)
 
       if (code) {
         const redirect_uri = `${import.meta.env.VITE_URL}/google/auth/callback`
@@ -23,12 +25,10 @@ const GoogleCallBack = () => {
           grant_type: 'authorization_code',
         })
         const { access_token, refresh_token } = response.data
-        console.log('RESDATRA', response.data)
         const profileResponse = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
           headers: { Authorization: `Bearer ${access_token}` },
         })
         const { email, id: googleId, picture, name } = profileResponse.data
-        console.log('Profile', profileResponse.data)
         const existingAccount = Cookies.get(`googleMailer_${email}`)
 
         if (existingAccount) {
@@ -58,13 +58,11 @@ const GoogleCallBack = () => {
             sameSite: 'strict',
             secure: true,
           })
-          window.location.href = `${import.meta.env.VITE_URL}`
         }
-        // window.location.href = `${import.meta.env.VITE_URL}/google/${email}`
-        window.location.href = `${import.meta.env.VITE_URL}`
-      } else {
-        window.location.href = `${import.meta.env.VITE_URL}`
       }
+
+      resetGmailSession()
+      navigate('/')
     }
     fetchData()
   }, [])

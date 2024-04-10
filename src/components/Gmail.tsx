@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
 import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
+import { useNavigate } from 'react-router-dom'
 
-import { deleteGoogleMail, getMessagesAndContent } from './auth/google/options'
+import { deleteGoogleMail, getMessagesAndContent, markAsRead } from './auth/google/options'
+import { resetGmailSession } from './auth/google/query'
 import { GoogleAccount, mailDatas } from './auth/google/types'
 import CopyMail from './copy'
 import Spinner from './spiner'
@@ -14,7 +17,7 @@ type Props = {
 }
 
 export default function Gmail({ accountData }: Props) {
-  console.log('ACC', accountData)
+  const navigate = useNavigate()
   const [selectedMessage, setSelectedMessage] = useState<any>()
   const [mailDatas, setMailDatas] = useState<mailDatas[]>([])
 
@@ -48,29 +51,27 @@ export default function Gmail({ accountData }: Props) {
     refetchOnWindowFocus: false,
     retry: 2,
   })
-  // console.log('MAILDATA', mailData)
 
-  console.log('<><><><><<<<', mailDatas.length)
   useEffect(() => {
     if (mailData) {
       setMailDatas(mailData.pages.flatMap(page => page?.messagesData))
     }
   }, [mailData])
 
-  // const { mutate } = useMutation({
-  //   mutationKey: ['read'],
-  //   mutationFn: ({ messId }: { messId: string }) =>
-  //     markAsRead(accountData?.accessToken, accountData?.refreshToken, messId),
-  //   onSuccess: (data, variables) => {
-  //     const updatedMailDatas = mailDatas.map(mess =>
-  //       mess?.messageId === variables.messId ? { ...mess, isUnread: false } : mess,
-  //     )
-  //     setMailDatas(updatedMailDatas)
-  //   },
-  // })
+  const { mutate } = useMutation({
+    mutationKey: ['read'],
+    mutationFn: ({ messId }: { messId: string }) =>
+      markAsRead(accountData?.accessToken, accountData?.refreshToken, messId),
+    onSuccess: (data, variables) => {
+      const updatedMailDatas = mailDatas.map(mess =>
+        mess?.messageId === variables.messId ? { ...mess, isUnread: false } : mess,
+      )
+      setMailDatas(updatedMailDatas)
+    },
+  })
 
   const chooseMessage = (data: Partial<mailDatas>) => {
-    // mutate({ messId: data?.messageId })
+    mutate({ messId: data?.messageId })
     setSelectedMessage(data!)
   }
 
@@ -81,9 +82,15 @@ export default function Gmail({ accountData }: Props) {
     }
   }, [inView])
 
-  // if (isPending) {
-  //   return <Spinner />
-  // }
+  const deleteMail = async (email: string) => {
+    toast.success('Success Delete', { position: 'top-left' })
+    await deleteGoogleMail(email)
+    resetGmailSession()
+    navigate('/')
+  }
+  if (isPending) {
+    return <Spinner />
+  }
 
   return (
     <div className="grid h-[100vh] grid-cols-5 bg-background pt-[6.8vh]">
@@ -99,7 +106,7 @@ export default function Gmail({ accountData }: Props) {
           />
           <LogOut
             className="cursor-pointer hover:scale-110"
-            onClick={() => deleteGoogleMail(accountData?.email)}
+            onClick={() => deleteMail(accountData?.email)}
           />
         </div>
         <div className="m-0 flex h-[87vh] w-full  flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">

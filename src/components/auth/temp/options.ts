@@ -1,39 +1,33 @@
-'use server'
-
-import { cookies } from 'next/headers'
 import axios from 'axios'
-import { redirect } from 'react-router-dom'
+import Cookies from 'js-cookie'
+import { redirect, useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import { decrypt, encrypt } from '../google/options'
+import { resetTempSession } from './query'
 import { TempAccount, TempMess } from './types'
 
+// import { useHistory } from 'react-router-dom';
+
 export async function getTempSession(): Promise<TempAccount[] | null> {
-  const cookiesAll = cookies()
-  const tempAccounts = cookiesAll.getAll().filter(cookie => cookie.name.startsWith('tempmail_'))
-  if (!tempAccounts || tempAccounts.length === 0) {
-    console.error('No tempmail cookies found')
-    return null
-  }
-  const accounts = await Promise.all(
-    tempAccounts.map(cookie => {
-      if (!cookie.value) {
-        console.error('Cookie value is undefined')
-        return null
-      }
-      return decrypt(cookie.value)
-    }),
-  )
-  return accounts.filter(account => account !== null)
+  const cookiesAll = Cookies.get()
+  const tempAccounts = Object.keys(cookiesAll)
+    .filter(cookieName => cookieName.startsWith('tempMailer_'))
+    .map(cookieName => cookiesAll[cookieName])
+  const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie)))
+  console.log('TEMMMS FIRST AC', accounts)
+  return accounts
 }
 
 export async function regTempEmailAccount() {
   const domains = await getDomains()
+
   if (!domains || !domains['hydra:member'] || domains['hydra:member'].length === 0) {
     console.error('No domains available')
     return undefined
   }
-  console.log('DOMAINS', domains)
+
+  console.log('DOMAINS GeT', domains)
   const username = uuidv4().substring(0, 8)
   const password = uuidv4().substring(0, 12)
   const address = `${username}@${domains['hydra:member'][0].domain}`
@@ -43,7 +37,7 @@ export async function regTempEmailAccount() {
       address: address,
       password: password,
     })
-    console.log('ACCRESP', accountResponse.data)
+    console.log('ACCRESP second', accountResponse.data)
 
     const loginResponse = await axios.post('https://api.mail.tm/token', {
       address: address,
@@ -56,27 +50,39 @@ export async function regTempEmailAccount() {
       accessToken: loginResponse.data.token,
       expires: new Date().setDate(new Date().getDate() + 1),
     }
+    console.log('NEW ACC', newAccount)
 
-    cookies().set(`tempmail_${address}`, await encrypt(newAccount), {
+    Cookies.set(`tempMailer_${address}`, await encrypt(newAccount), {
       expires: newAccount.expires,
-      httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
     })
   } catch (error) {
     console.error('Error during account creation or login:', error)
+
+    resetTempSession()
     redirect('/')
   }
+  resetTempSession()
   redirect(`temp/${address}`)
 }
 
 export async function deleteTempMail(email: string) {
-  cookies().delete(`tempmail_${email}`)
-  const activeAccount = await getTempSession()
-  if (!activeAccount) {
-    redirect('/')
-  } else {
-    redirect(`/temp/${activeAccount[0].email}`)
-  }
+  Cookies.remove(`tempMailer_${email}`)
 }
+
+// export async function deleteTempMail(email: string) {
+//   const navigate = useNavigate()
+//   Cookies.remove(`tempMailer_${email}`)
+//   const activeAccount = await getTempSession()
+//   if (!activeAccount) {
+//     // resetTempSession()
+//     navigate('/')
+//   } else {
+//     // resetTempSession()
+//     navigate(`/temp/${activeAccount[0].email}`)
+//   }
+// }
 
 export async function getTempMessages(token: string, page: string): Promise<TempMess | undefined> {
   try {

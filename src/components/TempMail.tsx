@@ -1,17 +1,15 @@
-'use client'
-
 import React, { useState } from 'react'
 import { formatTempDate } from '@/shared/lib/data-format'
 import { useQuery } from '@tanstack/react-query'
 import { LogOut, RotateCw, Tally1 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
-import { deleteTempMail, getMessageBody, getTempMessages } from '@/app/(auth)/temp/_auth/options'
-import { HydraMember, TempAccount } from '@/app/(auth)/temp/_auth/types'
-
+import { deleteTempMail, getMessageBody, getTempMessages } from './auth/temp/options'
+import { resetTempSession } from './auth/temp/query'
+import { HydraMember, TempAccount } from './auth/temp/types'
 import CopyMail from './copy'
 import Spinner from './spiner'
-import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 
 type Props = {
@@ -19,10 +17,11 @@ type Props = {
 }
 
 export default function TempMail({ accountData }: Props) {
+  const navigate = useNavigate()
   const [messageId, setMessBody] = useState<string | undefined>()
 
   const { data: messBody, isPending: pendingMessBody } = useQuery({
-    queryKey: ['temp', messageId],
+    queryKey: ['tempQuery', messageId],
     queryFn: () => getMessageBody(accountData.accessToken, messageId),
     refetchOnWindowFocus: false,
     enabled: !!messageId,
@@ -35,7 +34,7 @@ export default function TempMail({ accountData }: Props) {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ['temp', accountData.email],
+    queryKey: ['tempInfinty', accountData.email],
     queryFn: () => getTempMessages(accountData.accessToken, '1'),
     refetchOnWindowFocus: false,
     enabled: !!accountData.email,
@@ -43,8 +42,10 @@ export default function TempMail({ accountData }: Props) {
   })
 
   const deleteMail = async (email: string) => {
+    toast.success('Success Delete', { position: 'top-left' })
     await deleteTempMail(email)
-    toast.success('Success Delete', { position: 'bottom-left' })
+    resetTempSession()
+    navigate('/')
   }
 
   if (isPending) {

@@ -1,23 +1,23 @@
 import React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 
+import { getTempSession } from '@/components/auth/temp/options'
+import { useTempSession } from '@/components/auth/temp/query'
 import TempMail from '@/components/TempMail'
-import { getTempSession } from '@/app/(auth)/temp/_auth/options'
 
 export default function Temp() {
   const param = useParams()
-  console.log('TEMPPRAM', param)
-  // const mail = decodeURIComponent(params?.email)
-  // const session = await getTempSession();
-  // const tempAccount = session?.find((acc) => acc?.email === mail);
-
-  // if (!tempAccount) {
-  //   return <>gmail Not Found</>;
-  // }
+  const { data: googleSession } = useTempSession()
+  // const { data: googleSession } = useQuery({
+  //   queryKey: ['temp'],
+  //   queryFn: () => getTempSession(),
+  // })
+  const tempAccount = googleSession?.find(acc => acc?.email === param.mail)
 
   return (
     <section className="overflow-y-hidden">
-      {/* {tempAccount && <TempMail accountData={tempAccount} />} */}
+      {tempAccount && <TempMail accountData={tempAccount} />}
     </section>
   )
 }

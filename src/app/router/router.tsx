@@ -16,14 +16,14 @@ export default function Routes() {
         {
           path: '/',
           element: <Home />,
-          // {
-          //   path: '/temp/:mail',
-          //   element: <Temp />,
-          // },
         },
         {
           path: '/google/:mail',
           element: <Google />,
+        },
+        {
+          path: '/temp/:mail',
+          element: <Temp />,
         },
         {
           path: '/google/auth/callback',

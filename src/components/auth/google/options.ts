@@ -5,6 +5,7 @@ import Cookies from 'js-cookie'
 import { redirect } from 'react-router-dom'
 
 import { formatDate } from '../../../shared/lib/data-format'
+import { resetGmailSession } from './query'
 import { GoogleAccount } from './types'
 
 const secretKey = import.meta.env.VITE_SECRET
@@ -34,13 +35,8 @@ export async function decrypt(input: string): Promise<any> {
 
 export async function deleteGoogleMail(email: string) {
   Cookies.remove(`googleMailer_${email}`)
-  const activeAccount = await getGmailSession()
-  if (!activeAccount) {
-    redirect('/')
-  } else {
-    redirect(`/google/${activeAccount[0].email}`)
-  }
 }
+
 export async function getGmailSession(): Promise<GoogleAccount[] | null> {
   const cookiesAll = Cookies.get()
   const tempAccounts = Object.keys(cookiesAll)
@@ -50,40 +46,25 @@ export async function getGmailSession(): Promise<GoogleAccount[] | null> {
   return accounts
 }
 
-async function makeAuthenticatedRequest(url: string, accessToken: string, refreshToken: string) {
-  try {
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: 'application/json',
-      },
-    })
-    return { data: response.data, accessToken }
-  } catch (error) {
-    const axiosError = error as AxiosError
-    if (axiosError?.response?.status === 401) {
-      // Токен истек, попробуем обновить его
-      const refreshResponse = await axios.post('https://oauth2.googleapis.com/token', {
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token',
-      })
+async function makeAuthenticatedRequest(url: string, refreshToken: string) {
+  const refreshResponse = await axios.post('https://oauth2.googleapis.com/token', {
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+    client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+    refresh_token: refreshToken,
+    grant_type: 'refresh_token',
+  })
 
-      accessToken = refreshResponse.data.access_token
+  const accessToken = refreshResponse.data.access_token
 
-      // Повторите запрос с новым токеном доступа
-      const retryResponse = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Accept: 'application/json',
-        },
-      })
-      return { data: retryResponse.data, accessToken }
-    } else {
-      throw error
-    }
-  }
+  // Делаем запрос с новым токеном доступа
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+    },
+  })
+
+  return { data: response.data, accessToken }
 }
 
 export async function getMessagesAndContent(
@@ -97,15 +78,11 @@ export async function getMessagesAndContent(
 
   const url = `https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=100&pageToken=${pageToken}`
 
-  // const data = await makeAuthenticatedRequest(url, accessToken, refreshToken)
   const { data, accessToken: updatedAccessToken } = await makeAuthenticatedRequest(
     url,
-    accessToken,
     refreshToken,
+    // accessToken,
   )
-
-  // const data = response.data
-  console.log('RESSSSSSSSSSSSSS', data)
 
   const nextPageToken = data.nextPageToken
 
@@ -193,27 +170,53 @@ function extractName(from: string) {
   return match ? match[1].trim() : from
 }
 
-// export async function markAsRead(accessToken: string, refreshToken: string, messageId: string) {
-//   if (!accessToken || !refreshToken) {
-//     throw new Error('Account not found')
-//   }
+export async function markAsRead(accessToken: string, refreshToken: string, messageId: string) {
+  if (!accessToken || !refreshToken) {
+    throw new Error('Account not found')
+  }
 
-//   const oauth2Client = new google.auth.OAuth2(
-//     import.meta.env.VITE_GOOGLE_CLIENT_ID,
-//     import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-//   )
-//   oauth2Client.setCredentials({
-//     access_token: accessToken,
-//     refresh_token: refreshToken,
-//   })
+  const url = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`
 
-//   const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
+  try {
+    await axios.post(
+      url,
+      {
+        removeLabelIds: ['UNREAD'],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+        },
+      },
+    )
+  } catch (error) {
+    const axiosError = error as AxiosError
+    if (axiosError?.response?.status === 401) {
+      console.log('Token истек MODIFY')
+      const refreshResponse = await axios.post('https://oauth2.googleapis.com/token', {
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token',
+      })
 
-//   await gmail.users.messages.modify({
-//     userId: 'me',
-//     id: messageId,
-//     requestBody: {
-//       removeLabelIds: ['UNREAD'],
-//     },
-//   })
-// }
+      accessToken = refreshResponse.data.access_token
+
+      await axios.post(
+        url,
+        {
+          removeLabelIds: ['UNREAD'],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: 'application/json',
+          },
+        },
+      )
+    } else {
+      throw error
+    }
+  }
+}
