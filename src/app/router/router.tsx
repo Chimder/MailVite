@@ -26,7 +26,7 @@ export default function Routes() {
           element: <Temp />,
         },
         {
-          path: '/google/auth/callback/:code',
+          path: '/google/auth/callback',
           element: <GoogleCallBack />,
         },
         // {

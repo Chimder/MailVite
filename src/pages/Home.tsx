@@ -1,6 +1,5 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import { GoogleLoginURL } from '@/components/auth/google/options'
 import { useGmailSession } from '@/components/auth/google/query'
 import { regTempEmailAccount } from '@/components/auth/temp/options'
 import { useTempSession } from '@/components/auth/temp/query'
@@ -18,6 +17,8 @@ import {
 export default function Home() {
   const { data: googleSession } = useGmailSession()
   const { data: tempSession } = useTempSession()
+  const redirect_uri = `${import.meta.env.VITE_URL}/google/auth/callback`
+  const GoogleLoginURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=code&scope=openid%20profile%20email%20https://www.googleapis.com/auth/gmail.modify&access_type=offline&prompt=consent`
 
   // const path = useParams()
   const limit = (googleSession?.length || 0) + (tempSession?.length || 0) === 6
@@ -65,10 +66,10 @@ export default function Home() {
               </Link>
               <Button
                 onClick={() => regTempEmailAccount()}
-                className={`w-full ${limit && 'pointer-events-none'}`}
+                className={`w-full  ${limit && 'pointer-events-none'}`}
               >
                 <svg
-                  className="h-28 w-28"
+                  className="w-28"
                   viewBox="0 0 147 32"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import Spinner from '../../spiner'
@@ -11,7 +11,9 @@ import { GoogleAccount } from './types'
 
 const GoogleCallBack = () => {
   const navigate = useNavigate()
-  const { code } = useParams()
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const code = searchParams.get('code')
 
   useEffect(() => {
     const fetchData = async () => {
