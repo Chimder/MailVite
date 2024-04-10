@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import Spinner from '../../spiner'
@@ -11,10 +11,10 @@ import { GoogleAccount } from './types'
 
 const GoogleCallBack = () => {
   const navigate = useNavigate()
+  const { code } = useParams()
+
   useEffect(() => {
     const fetchData = async () => {
-      const code = new URL(window.location.href).searchParams.get('code')
-
       if (code) {
         const redirect_uri = `${import.meta.env.VITE_URL}/google/auth/callback`
         const response = await axios.post('https://oauth2.googleapis.com/token', {
