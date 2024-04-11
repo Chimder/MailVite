@@ -14,7 +14,6 @@ export default function CopyMail({ mail }: { mail: string }) {
         <Copy className="cursor-pointer" />
       </CopyToClipboard>
 
-      {/* {copied ? <span style={{ color: 'red' }}>Скопировано.</span> : null} */}
     </div>
   )
 }

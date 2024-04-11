@@ -67,6 +67,7 @@ export default function Home() {
               <Button
                 onClick={() => regTempEmailAccount()}
                 className={`w-full  ${limit && 'pointer-events-none'}`}
+                disabled={limit}
               >
                 <svg
                   className="w-28"

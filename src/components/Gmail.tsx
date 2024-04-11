@@ -93,21 +93,25 @@ export default function Gmail({ accountData }: Props) {
   }
 
   return (
-    <div className="grid h-[100vh] grid-cols-5 bg-background pt-[6.8vh]">
-      <section className="col-span-2 flex flex-col items-center justify-start pl-[12vw] ">
-        <div className="my-2 flex w-full items-center justify-evenly">
-          <Button>{accountData.email}</Button>
-          <div className="cursor-pointer hover:scale-110">
-            <CopyMail mail={accountData.email} />
+    <div className="grid h-[100vh] grid-cols-5 bg-background pt-[6.8vh] lg:grid-cols-1">
+      <section
+        className={`col-span-2 flex flex-col items-center justify-start pl-[12vw] 2xl:pl-[6vw] xl:pl-0 lg:col-span-1 ${selectedMessage && 'lg:hidden'}`}
+      >
+        <div className="my-2 flex w-full items-center  justify-evenly xl:flex-col">
+          <Button className="xl:mb-1 xl:w-full">{accountData.email}</Button>
+          <div className="flex w-full  items-center justify-evenly">
+            <div className="cursor-pointer hover:scale-110">
+              <CopyMail mail={accountData.email} />
+            </div>
+            <RotateCw
+              onClick={() => refetch()}
+              className={`cursor-pointer hover:scale-110 ${isFetching ? 'animate-spin' : ''}`}
+            />
+            <LogOut
+              className="cursor-pointer hover:scale-110"
+              onClick={() => deleteMail(accountData?.email)}
+            />
           </div>
-          <RotateCw
-            onClick={() => refetch()}
-            className={`cursor-pointer hover:scale-110 ${isFetching ? 'animate-spin' : ''}`}
-          />
-          <LogOut
-            className="cursor-pointer hover:scale-110"
-            onClick={() => deleteMail(accountData?.email)}
-          />
         </div>
         <div className="m-0 flex h-[87vh] w-full  flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
           {mailDatas &&
@@ -143,21 +147,41 @@ export default function Gmail({ accountData }: Props) {
         </div>
       </section>
 
-      <section className="col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden">
-        {selectedMessage?.bodyData && /<[a-z][\s\S]*>/i.test(selectedMessage?.bodyData) ? (
-          <iframe
-            className="flex h-full w-full flex-col items-center justify-center overflow-x-hidden font-sans"
-            srcDoc={selectedMessage?.bodyData}
-          />
-        ) : (
-          <div
-            className=" flex w-full flex-col items-center justify-center whitespace-pre-wrap px-4"
-            key={selectedMessage?.bodyData}
-          >
-            {selectedMessage?.bodyData}
-          </div>
-        )}
+      <section
+        className={`col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden overflow-y-hidden xl:col-span-3 ${selectedMessage ? 'lg:col-span-1' : 'lg:hidden'}`}
+      >
+        <div className="">
+          {selectedMessage && (
+            <section className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden">
+              <button className="" onClick={() => setSelectedMessage(null)}>
+                Назад
+              </button>
+            </section>
+          )}
+        </div>
+        <div className="h-full w-full">
+          {selectedMessage?.bodyData && /<[a-z][\s\S]*>/i.test(selectedMessage?.bodyData) ? (
+            <iframe
+              className="flex h-full   !w-full flex-col items-center justify-center overflow-x-hidden font-sans"
+              srcDoc={selectedMessage?.bodyData}
+            />
+          ) : (
+            <div
+              className=" flex w-full flex-col items-center justify-center whitespace-pre-wrap px-4"
+              key={selectedMessage?.bodyData}
+            >
+              {selectedMessage?.bodyData}
+            </div>
+          )}
+        </div>
       </section>
     </div>
   )
 }
+
+// {selectedMessage && (
+//   <section className="xl:col-span-4 xl:flex xl:w-full xl:flex-col xl:items-center xl:justify-center xl:overflow-x-hidden xl:overflow-y-hidden">
+//     <button onClick={() => setSelectedMessage(null)}>Назад</button>
+//     {/* Отображение выбранного сообщения */}
+//   </section>
+// )}

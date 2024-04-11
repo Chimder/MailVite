@@ -2,16 +2,12 @@ import axios, { AxiosError } from 'axios'
 import { jwtVerify, SignJWT } from 'jose'
 import { Base64 } from 'js-base64'
 import Cookies from 'js-cookie'
-import { redirect } from 'react-router-dom'
 
 import { formatDate } from '../../../shared/lib/data-format'
-import { resetGmailSession } from './query'
 import { GoogleAccount } from './types'
 
 const secretKey = import.meta.env.VITE_SECRET
 const key = new TextEncoder().encode(secretKey)
-const redirect_uri = `${import.meta.env.VITE_URL}/google/auth/callback`
-export const GoogleLoginURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=code&scope=openid%20profile%20email%20https://www.googleapis.com/auth/gmail.modify&access_type=offline&prompt=consent`
 
 export async function encrypt(payload: any) {
   return await new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().sign(key)
