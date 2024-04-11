@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
+import parse from 'html-react-parser'
 import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { deleteGoogleMail, getMessagesAndContent, markAsRead } from './auth/google/options'
 import { resetGmailSession } from './auth/google/query'
@@ -18,6 +19,7 @@ type Props = {
 
 export default function Gmail({ accountData }: Props) {
   const navigate = useNavigate()
+  const params = useParams()
   const [selectedMessage, setSelectedMessage] = useState<any>()
   const [mailDatas, setMailDatas] = useState<mailDatas[]>([])
 
@@ -57,6 +59,10 @@ export default function Gmail({ accountData }: Props) {
       setMailDatas(mailData.pages.flatMap(page => page?.messagesData))
     }
   }, [mailData])
+
+  useEffect(() => {
+    setSelectedMessage(null)
+  }, [params.mail])
 
   const { mutate } = useMutation({
     mutationKey: ['read'],
@@ -148,21 +154,21 @@ export default function Gmail({ accountData }: Props) {
       </section>
 
       <section
-        className={`col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden overflow-y-hidden xl:col-span-3 ${selectedMessage ? 'lg:col-span-1' : 'lg:hidden'}`}
+        className={`relative col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden overflow-y-hidden xl:col-span-3 ${selectedMessage ? 'lg:col-span-1' : 'lg:hidden'}`}
       >
-        <div className="">
+        <div className="relative lg:py-4">
           {selectedMessage && (
-            <section className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden">
-              <button className="" onClick={() => setSelectedMessage(null)}>
-                Назад
-              </button>
-            </section>
+            <div className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden">
+              <Button className="w-[60vw]" onClick={() => setSelectedMessage(null)}>
+                Back
+              </Button>
+            </div>
           )}
         </div>
-        <div className="h-full w-full">
+        <div className=" h-full max-h-screen w-full overflow-auto">
           {selectedMessage?.bodyData && /<[a-z][\s\S]*>/i.test(selectedMessage?.bodyData) ? (
             <iframe
-              className="flex h-full   !w-full flex-col items-center justify-center overflow-x-hidden font-sans"
+              className="flex h-full w-full items-center justify-center overflow-x-hidden font-sans"
               srcDoc={selectedMessage?.bodyData}
             />
           ) : (
@@ -178,10 +184,3 @@ export default function Gmail({ accountData }: Props) {
     </div>
   )
 }
-
-// {selectedMessage && (
-//   <section className="xl:col-span-4 xl:flex xl:w-full xl:flex-col xl:items-center xl:justify-center xl:overflow-x-hidden xl:overflow-y-hidden">
-//     <button onClick={() => setSelectedMessage(null)}>Назад</button>
-//     {/* Отображение выбранного сообщения */}
-//   </section>
-// )}
