@@ -14,6 +14,7 @@ export default function Temp() {
   //   queryFn: () => getTempSession(),
   // })
   const tempAccount = googleSession?.find(acc => acc?.email === param.mail)
+  console.log('tempppAcc', tempAccount)
 
   return (
     <section className="overflow-y-hidden">
