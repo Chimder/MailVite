@@ -13,7 +13,6 @@ export default function CopyMail({ mail }: { mail: string }) {
       <CopyToClipboard text={mail} onCopy={() => setIsCopie()}>
         <Copy className="cursor-pointer" />
       </CopyToClipboard>
-
     </div>
   )
 }

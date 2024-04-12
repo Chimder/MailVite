@@ -10,7 +10,10 @@ const secretKey = import.meta.env.VITE_SECRET
 const key = new TextEncoder().encode(secretKey)
 
 export async function encrypt(payload: any) {
-  return await new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().sign(key)
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .sign(key)
 }
 
 export async function decrypt(input: string): Promise<any> {
@@ -38,17 +41,22 @@ export async function getGmailSession(): Promise<GoogleAccount[] | null> {
   const tempAccounts = Object.keys(cookiesAll)
     .filter(cookieName => cookieName.startsWith('googleMailer_'))
     .map(cookieName => cookiesAll[cookieName])
-  const accounts = await Promise.all(tempAccounts.map(cookie => decrypt(cookie)))
+  const accounts = await Promise.all(
+    tempAccounts.map(cookie => decrypt(cookie)),
+  )
   return accounts
 }
 
 async function makeAuthenticatedRequest(url: string, refreshToken: string) {
-  const refreshResponse = await axios.post('https://oauth2.googleapis.com/token', {
-    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-    client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-    refresh_token: refreshToken,
-    grant_type: 'refresh_token',
-  })
+  const refreshResponse = await axios.post(
+    'https://oauth2.googleapis.com/token',
+    {
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token',
+    },
+  )
 
   const accessToken = refreshResponse.data.access_token
 
@@ -74,11 +82,12 @@ export async function getMessagesAndContent(
 
   const url = `https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=100&pageToken=${pageToken}`
 
-  const { data, accessToken: updatedAccessToken } = await makeAuthenticatedRequest(
-    url,
-    refreshToken,
-    // accessToken,
-  )
+  const { data, accessToken: updatedAccessToken } =
+    await makeAuthenticatedRequest(
+      url,
+      refreshToken,
+      // accessToken,
+    )
 
   const nextPageToken = data.nextPageToken
 
@@ -105,10 +114,16 @@ export async function getMessagesAndContent(
         const payload = message.value?.payload
         const headers = payload?.headers
         if (headers) {
-          const subjectHeader = headers.find((header: any) => header.name === 'Subject')
-          const fromHeader = headers.find((header: any) => header.name === 'From')
+          const subjectHeader = headers.find(
+            (header: any) => header.name === 'Subject',
+          )
+          const fromHeader = headers.find(
+            (header: any) => header.name === 'From',
+          )
           const toHeader = headers.find((header: any) => header.name === 'To')
-          const dateHeader = headers.find((header: any) => header.name === 'Date')
+          const dateHeader = headers.find(
+            (header: any) => header.name === 'Date',
+          )
 
           const subject = subjectHeader ? subjectHeader.value : ''
           const from = fromHeader ? extractName(fromHeader.value) : ''
@@ -166,7 +181,11 @@ function extractName(from: string) {
   return match ? match[1].trim() : from
 }
 
-export async function markAsRead(accessToken: string, refreshToken: string, messageId: string) {
+export async function markAsRead(
+  accessToken: string,
+  refreshToken: string,
+  messageId: string,
+) {
   if (!accessToken || !refreshToken) {
     throw new Error('Account not found')
   }
@@ -190,12 +209,15 @@ export async function markAsRead(accessToken: string, refreshToken: string, mess
     const axiosError = error as AxiosError
     if (axiosError?.response?.status === 401) {
       console.log('Token истек MODIFY')
-      const refreshResponse = await axios.post('https://oauth2.googleapis.com/token', {
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token',
-      })
+      const refreshResponse = await axios.post(
+        'https://oauth2.googleapis.com/token',
+        {
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+          refresh_token: refreshToken,
+          grant_type: 'refresh_token',
+        },
+      )
 
       accessToken = refreshResponse.data.access_token
 

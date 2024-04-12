@@ -12,10 +12,10 @@ import { TempAccount, TempMess } from './types'
 export async function getTempSession(): Promise<TempAccount[] | null> {
   const cookiesAll = Cookies.get()
   const tempAccounts = Object.keys(cookiesAll)
-    .filter(cookieName => cookieName.startsWith('tempMailer_'))
-    .map(cookieName => cookiesAll[cookieName])
+    .filter((cookieName) => cookieName.startsWith('tempMailer_'))
+    .map((cookieName) => cookiesAll[cookieName])
   const accounts = await Promise.all(
-    tempAccounts.map(cookie => decrypt(cookie)),
+    tempAccounts.map((cookie) => decrypt(cookie)),
   )
   console.log('TEMMMS FIRST AC', accounts)
   return accounts
