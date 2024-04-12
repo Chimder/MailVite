@@ -28,12 +28,17 @@ export default function Home() {
         <CardHeader>
           <CardTitle>Manage your mail</CardTitle>
           <CardDescription>Connect to Gmail or Temp mail</CardDescription>
-          {limit && <CardTitle className="text-sm text-red-600">Limit 6 mail</CardTitle>}
+          {limit && (
+            <CardTitle className="text-sm text-red-600">Limit 6 mail</CardTitle>
+          )}
         </CardHeader>
         <CardContent>
           <div className="px-10">
             <div className="flex  flex-col items-center justify-center space-y-5">
-              <Link className={`w-full ${limit && 'pointer-events-none'}`} to={GoogleLoginURL}>
+              <Link
+                className={`w-full ${limit && 'pointer-events-none'}`}
+                to={GoogleLoginURL}
+              >
                 <Button disabled={limit} className="w-full">
                   <svg
                     className="mr-1 h-7 w-7"

@@ -2,7 +2,7 @@
 module.exports = {
   semi: false,
   singleQuote: true,
-  printWidth: 100,
+  printWidth: 80,
   tabWidth: 2,
   trailingComma: 'all',
   arrowParens: 'avoid',
@@ -51,8 +51,5 @@ module.exports = {
   importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
   importOrderMergeDuplicateImports: true,
   importOrderCombineTypeAndValueImports: true,
-  plugins: [
-    '@ianvs/prettier-plugin-sort-imports',
-    'prettier-plugin-tailwindcss'
-  ],
+  plugins: ['@ianvs/prettier-plugin-sort-imports', 'prettier-plugin-tailwindcss'],
 }

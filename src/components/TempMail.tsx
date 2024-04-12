@@ -5,7 +5,11 @@ import { LogOut, RotateCw, Tally1 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { deleteTempMail, getMessageBody, getTempMessages } from './auth/temp/options'
+import {
+  deleteTempMail,
+  getMessageBody,
+  getTempMessages,
+} from './auth/temp/options'
 import { resetTempSession } from './auth/temp/query'
 import { HydraMember, TempAccount } from './auth/temp/types'
 import CopyMail from './copy'
@@ -90,12 +94,16 @@ export default function TempMail({ accountData }: Props) {
                   <div className="w-full">
                     <div className="flex justify-between">
                       <div className="flex text-base">{mess.from.name}</div>
-                      <div className="pr-1 text-sm">{formatTempDate(mess.createdAt)}</div>
+                      <div className="pr-1 text-sm">
+                        {formatTempDate(mess.createdAt)}
+                      </div>
                     </div>
                     <div className="line-clamp-1 w-full overflow-hidden text-ellipsis text-sm">
                       {mess.subject}
                     </div>
-                    <div className="line-clamp-2 w-full text-sm">{mess.intro}</div>
+                    <div className="line-clamp-2 w-full text-sm">
+                      {mess.intro}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -104,12 +112,19 @@ export default function TempMail({ accountData }: Props) {
       </section>
 
       <section
-        className={`relative col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden overflow-y-hidden xl:col-span-3 ${messageId ? 'lg:col-span-1' : 'lg:hidden'}`}
+        className={`relative col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden
+        overflow-y-hidden xl:col-span-3 ${messageId ? 'lg:col-span-1' : 'lg:hidden'}`}
       >
         <div className="relative lg:py-4">
           {messBody && (
-            <div className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden">
-              <Button className="w-[60vw]" onClick={() => setMessBody(undefined)}>
+            <div
+              className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center
+              lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden"
+            >
+              <Button
+                className="w-[60vw]"
+                onClick={() => setMessBody(undefined)}
+              >
                 Назад
               </Button>
             </div>

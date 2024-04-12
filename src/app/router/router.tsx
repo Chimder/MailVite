@@ -40,22 +40,6 @@ export default function Routes() {
         //     return { user, emotes };
         //   },
         // },
-        // {
-        //   path: PATH.SIGNUP,
-        //   element: (
-        //     <ProtectedSign>
-        //       <SignUp />
-        //     </ProtectedSign>
-        //   ),
-        // },
-        // {
-        //   path: PATH.SIGNIN,
-        //   element: (
-        //     <ProtectedSign>
-        //       <SignIn />
-        //     </ProtectedSign>
-        //   ),
-        // },
       ],
     },
   ])
