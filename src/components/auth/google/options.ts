@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios'
-import { jwtVerify, SignJWT } from 'jose'
+import { JWTPayload, jwtVerify, SignJWT } from 'jose'
 import { Base64 } from 'js-base64'
 import Cookies from 'js-cookie'
 
@@ -9,27 +9,18 @@ import { GoogleAccount } from './types'
 const secretKey = import.meta.env.VITE_SECRET
 const key = new TextEncoder().encode(secretKey)
 
-export async function encrypt(payload: any) {
+export async function encrypt(payload: any): Promise<string> {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .sign(key)
 }
 
-export async function decrypt(input: string): Promise<any> {
-  if (!input) {
-    console.error('ER dECRYPT INPUT')
-    return undefined
-  }
-  try {
-    const { payload } = await jwtVerify(input, key, {
-      algorithms: ['HS256'],
-    })
-    return payload
-  } catch (error) {
-    console.error('Error during decryption:', error)
-    return undefined
-  }
+export async function decrypt<T>(input: string): Promise<T> {
+  const { payload } = await jwtVerify(input, key, {
+    algorithms: ['HS256'],
+  })
+  return payload as T
 }
 
 export async function deleteGoogleMail(email: string) {
@@ -42,7 +33,7 @@ export async function getGmailSession(): Promise<GoogleAccount[] | null> {
     .filter(cookieName => cookieName.startsWith('googleMailer_'))
     .map(cookieName => cookiesAll[cookieName])
   const accounts = await Promise.all(
-    tempAccounts.map(cookie => decrypt(cookie)),
+    tempAccounts.map(cookie => decrypt<GoogleAccount>(cookie)),
   )
   return accounts
 }
@@ -60,7 +51,6 @@ async function makeAuthenticatedRequest(url: string, refreshToken: string) {
 
   const accessToken = refreshResponse.data.access_token
 
-  // Делаем запрос с новым токеном доступа
   const response = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,

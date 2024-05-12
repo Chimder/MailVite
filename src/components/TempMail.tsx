@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatTempDate } from '@/shared/lib/data-format'
 import { useQuery } from '@tanstack/react-query'
 import { LogOut, RotateCw, Tally1 } from 'lucide-react'

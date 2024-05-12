@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
-import parse from 'html-react-parser'
 import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
@@ -22,9 +21,11 @@ type Props = {
 }
 
 export default function Gmail({ accountData }: Props) {
+  console.log('AC', accountData)
   const navigate = useNavigate()
   const params = useParams()
-  const [selectedMessage, setSelectedMessage] = useState<any>()
+  const [selectedMessage, setSelectedMessage] =
+    useState<Partial<mailDatas> | null>()
   const [mailDatas, setMailDatas] = useState<mailDatas[]>([])
 
   const fetchMessPages = async ({ pageParam }: { pageParam?: number }) => {
@@ -60,7 +61,8 @@ export default function Gmail({ accountData }: Props) {
 
   useEffect(() => {
     if (mailData) {
-      setMailDatas(mailData.pages.flatMap(page => page?.messagesData))
+      const messages = mailData.pages.flatMap(page => page?.messagesData)
+      setMailDatas(messages)
     }
   }, [mailData])
 
@@ -84,7 +86,7 @@ export default function Gmail({ accountData }: Props) {
 
   const chooseMessage = (data: Partial<mailDatas>) => {
     mutate({ messId: data?.messageId })
-    setSelectedMessage(data!)
+    setSelectedMessage(data)
   }
 
   const { ref, inView } = useInView()
@@ -118,7 +120,7 @@ export default function Gmail({ accountData }: Props) {
             </div>
             <RotateCw
               onClick={() => refetch()}
-              className={`cursor-pointer hover:scale-110 ${isFetching ? 'animate-spin' : ''}`}
+              className={`cursor-pointer hover:scale-110 ${isFetching && !isFetchingNextPage ? 'animate-spin' : ''}`}
             />
             <LogOut
               className="cursor-pointer hover:scale-110"

@@ -1,12 +1,7 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import Spinner from '../../spiner'
@@ -46,11 +41,10 @@ const GoogleCallBack = () => {
 
         if (existingAccount) {
           // Update existing account
-          const account = await decrypt(existingAccount)
+          const account = await decrypt<GoogleAccount>(existingAccount)
           account.accessToken = access_token
           account.refreshToken = refresh_token
           Cookies.set(`googleMailer_${account.email}`, await encrypt(account), {
-            // expires: new Date().setFullYear(new Date().getFullYear() + 1),
             expires: Date.now() + 365 * 24 * 60 * 60 * 1000,
             sameSite: 'strict',
             secure: true,
@@ -67,6 +61,7 @@ const GoogleCallBack = () => {
             refreshToken: refresh_token,
             userId: uuidv4(),
           }
+          console.log('ACCCCKKJDKJS', account)
           Cookies.set(`googleMailer_${account.email}`, await encrypt(account), {
             // expires: new Date().setFullYear(new Date().getFullYear() + 1),
             expires: Date.now() + 365 * 24 * 60 * 60 * 1000,

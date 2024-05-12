@@ -1,23 +1,26 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { redirect, useNavigate } from 'react-router-dom'
+import { redirect } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import { decrypt, encrypt } from '../google/options'
 import { resetTempSession } from './query'
 import { TempAccount, TempMess } from './types'
 
-// import { useHistory } from 'react-router-dom';
-
 export async function getTempSession(): Promise<TempAccount[] | null> {
   const cookiesAll = Cookies.get()
   const tempAccounts = Object.keys(cookiesAll)
-    .filter((cookieName) => cookieName.startsWith('tempMailer_'))
-    .map((cookieName) => cookiesAll[cookieName])
+    .filter(cookieName => cookieName.startsWith('tempMailer_'))
+    .map(cookieName => cookiesAll[cookieName])
   const accounts = await Promise.all(
-    tempAccounts.map((cookie) => decrypt(cookie)),
+    tempAccounts.map(cookie => {
+      const decrypted = decrypt<TempAccount>(cookie)
+      if (typeof decrypted === 'object' && decrypted !== null) {
+        return decrypted
+      }
+      throw new Error('Invalid cookie format')
+    }),
   )
-  console.log('TEMMMS FIRST AC', accounts)
   return accounts
 }
 
@@ -29,11 +32,9 @@ export async function regTempEmailAccount() {
     !domains['hydra:member'] ||
     domains['hydra:member'].length === 0
   ) {
-    console.error('No domains available')
     return undefined
   }
 
-  console.log('DOMAINS GeT', domains)
   const username = uuidv4().substring(0, 8)
   const password = uuidv4().substring(0, 12)
   const address = `${username}@${domains['hydra:member'][0].domain}`
@@ -54,7 +55,6 @@ export async function regTempEmailAccount() {
       email: address,
       provider: 'mail.tm',
       accessToken: loginResponse.data.token,
-      // expires: new Date().setDate(new Date().getDate() + 1),
       expires: Date.now() + 24 * 60 * 60 * 1000,
     }
     console.log('NEW ACC', newAccount)
@@ -77,19 +77,6 @@ export async function regTempEmailAccount() {
 export async function deleteTempMail(email: string) {
   Cookies.remove(`tempMailer_${email}`)
 }
-
-// export async function deleteTempMail(email: string) {
-//   const navigate = useNavigate()
-//   Cookies.remove(`tempMailer_${email}`)
-//   const activeAccount = await getTempSession()
-//   if (!activeAccount) {
-//     // resetTempSession()
-//     navigate('/')
-//   } else {
-//     // resetTempSession()
-//     navigate(`/temp/${activeAccount[0].email}`)
-//   }
-// }
 
 export async function getTempMessages(
   token: string,

@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCw } from 'lucide-react'
 
-type Props = {
-  // isLoading: boolean
-}
+// type Props = {
+//    isLoading: boolean
+// }
 
-export default function Spinner({}: Props) {
+export default function Spinner() {
   return (
     <AnimatePresence>
       <motion.div
