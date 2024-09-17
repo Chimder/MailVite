@@ -11,7 +11,7 @@ export default function CopyMail({ mail }: { mail: string }) {
   return (
     <div>
       <CopyToClipboard text={mail} onCopy={() => setIsCopie()}>
-        <Copy className="cursor-pointer" />
+        <Copy style={{ cursor: 'pointer' }} />
       </CopyToClipboard>
     </div>
   )

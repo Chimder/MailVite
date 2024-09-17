@@ -5,16 +5,16 @@ import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { resetGmailSession } from '../../hooks/google'
 import {
   deleteGoogleMail,
   getMessagesAndContent,
   markAsRead,
-} from './auth/google/options'
-import { resetGmailSession } from './auth/google/query'
-import { GoogleAccount, mailDatas } from './auth/google/types'
-import CopyMail from './copy'
-import Spinner from './spiner'
-import { Button } from './ui/button'
+} from '../auth/google/options'
+import { GoogleAccount, mailDatas } from '../auth/google/types'
+import CopyMail from '../copy'
+import Spinner from '../ui/spiner'
+import { Button } from '@radix-ui/themes'
 
 type Props = {
   accountData: GoogleAccount

@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react'
 import { formatTempDate } from '@/shared/lib/data-format'
+import { Button } from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
+import clsx from 'clsx'
 import { LogOut, RotateCw, Tally1 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useNavigate, useParams } from 'react-router-dom'
+
+import { resetTempSession } from '@/hooks/temp'
 
 import {
   deleteTempMail,
   getMessageBody,
   getTempMessages,
-} from './auth/temp/options'
-import { resetTempSession } from './auth/temp/query'
-import { HydraMember, TempAccount } from './auth/temp/types'
-import CopyMail from './copy'
-import Spinner from './spiner'
-import { Button } from './ui/button'
+} from '../auth/temp/options'
+import { HydraMember, TempAccount } from '../auth/temp/types'
+import CopyMail from '../copy'
+import Spinner from '../ui/spiner'
+import s from './tempx.module.scss'
 
 type Props = {
   accountData: TempAccount
@@ -61,49 +64,46 @@ export default function TempMail({ accountData }: Props) {
   }
 
   return (
-    <div className="grid h-[100vh] grid-cols-5 bg-background pt-[6.8vh] lg:grid-cols-1">
-      <section
-        className={`col-span-2 flex flex-col items-center justify-start pl-[12vw] 2xl:pl-[6vw] xl:pl-0 lg:col-span-1 ${messageId && 'lg:hidden'}`}
-      >
-        <div className="my-2 flex w-full items-center  justify-evenly xl:flex-col">
-          <Button className="xl:mb-1 xl:w-full">{accountData.email}</Button>
-          <div className="flex w-full  items-center justify-evenly">
-            <div className="cursor-pointer hover:scale-110">
+    <div className={s.mainWrap}>
+      <section className={clsx(s.navTempWrap, messageId && s.message)}>
+        <div className={s.navTemp}>
+          <Button className={s.mailButt}>{accountData.email}</Button>
+          <div className={s.panel}>
+            <div className={s.cursor}>
               <CopyMail mail={accountData.email} />
             </div>
             <RotateCw
               onClick={() => refetch()}
-              className={`cursor-pointer hover:scale-110 ${isFetching ? 'animate-spin' : ''}`}
+              className={clsx(s.cursor, isFetching && s.fetch)}
             />
             <LogOut
-              className="cursor-pointer hover:scale-110"
+              className={s.cursor}
               onClick={() => deleteMail(accountData?.email)}
             />
           </div>
         </div>
-        <div className="m-0 flex h-[87vh] w-full flex-col items-center justify-start overflow-x-hidden overflow-y-scroll p-0">
+        <div className={s.messageList}>
           {mess &&
             mess?.['hydra:member']?.map((mess: HydraMember) => (
               <div
                 key={mess.id}
-                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-slate-500/25 ${messageId == mess.id ? 'bg-slate-500/25' : ''}`}
+                className={clsx(
+                  s.messageWrap,
+                  messageId == mess.id && s.select,
+                )}
                 onClick={() => setMessBody(mess.id)}
               >
-                <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
-                  <Tally1 className="h-6 w-6 pr-1 text-orange-500" />
-                  <div className="w-full">
-                    <div className="flex justify-between">
-                      <div className="flex text-base">{mess.from.name}</div>
-                      <div className="pr-1 text-sm">
+                <div className={s.message}>
+                  <Tally1 className={s.readIcon} />
+                  <div className={s.messageInfoWrap}>
+                    <div className={s.messageInfo}>
+                      <div className={s.name}>{mess.from.name}</div>
+                      <div className={s.time}>
                         {formatTempDate(mess.createdAt)}
                       </div>
                     </div>
-                    <div className="line-clamp-1 w-full overflow-hidden text-ellipsis text-sm">
-                      {mess.subject}
-                    </div>
-                    <div className="line-clamp-2 w-full text-sm">
-                      {mess.intro}
-                    </div>
+                    <div className={s.sub}>{mess.subject}</div>
+                    <div className={s.info}>{mess.intro}</div>
                   </div>
                 </div>
               </div>
@@ -112,15 +112,11 @@ export default function TempMail({ accountData }: Props) {
       </section>
 
       <section
-        className={`relative col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden
-        overflow-y-hidden xl:col-span-3 ${messageId ? 'lg:col-span-1' : 'lg:hidden'}`}
+        className={`relative col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden overflow-y-hidden xl:col-span-3 ${messageId ? 'lg:col-span-1' : 'lg:hidden'}`}
       >
         <div className="relative lg:py-4">
           {messBody && (
-            <div
-              className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center
-              lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden"
-            >
+            <div className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden">
               <Button
                 className="w-[60vw]"
                 onClick={() => setMessBody(undefined)}
@@ -130,7 +126,7 @@ export default function TempMail({ accountData }: Props) {
             </div>
           )}
         </div>
-        <div className=" h-full max-h-screen w-full overflow-auto">
+        <div className="h-full max-h-screen w-full overflow-auto">
           {messBody && (
             <iframe
               key={messBody.id}

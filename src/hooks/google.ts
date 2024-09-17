@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { queryClient } from '@/app/providers'
+import { queryClient } from '@/app/providers/providers'
 
-import { getGmailSession } from './options'
+import { getGmailSession } from '../components/auth/google/options'
 
 export function useGmailSession() {
   return useQuery({

@@ -1,9 +1,9 @@
 import { CirclePlus } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
-import { useGmailSession } from './auth/google/query'
-import { useTempSession } from './auth/temp/query'
-import { ThemeToggle } from './ui/themeToggle'
+import { useGmailSession } from '../../hooks/google'
+import { useTempSession } from '../../hooks/temp'
+import { ThemeToggle } from '../ui/themeToggle'
 
 export const MainLayout = () => {
   const { data: googleSession } = useGmailSession()
@@ -21,7 +21,11 @@ export const MainLayout = () => {
             to={`/google/${email.email}`}
             key={email.providerAccountId}
           >
-            <img className="h-10 w-10 rounded-full" src={email.picture} alt="" />
+            <img
+              className="h-10 w-10 rounded-full"
+              src={email.picture}
+              alt=""
+            />
           </Link>
         ))}
         {tempSession?.map((email, i) => (
@@ -30,7 +34,11 @@ export const MainLayout = () => {
             to={`/temp/${email.email}`}
             key={email.email}
           >
-            <img className="h-10 w-10 rounded-full" src="/Logo/MailTm_Logo.webp" alt="" />
+            <img
+              className="h-10 w-10 rounded-full"
+              src="/Logo/MailTm_Logo.webp"
+              alt=""
+            />
           </Link>
         ))}
 

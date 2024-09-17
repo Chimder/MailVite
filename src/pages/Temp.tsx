@@ -1,13 +1,12 @@
 import { useParams } from 'react-router-dom'
 
-import { useTempSession } from '@/components/auth/temp/query'
-import TempMail from '@/components/TempMail'
+import { useTempSession } from '@/hooks/temp'
+import TempMail from '@/components/Temp/TempMail'
 
 export default function Temp() {
   const param = useParams()
   const { data: googleSession } = useTempSession()
   const tempAccount = googleSession?.find(acc => acc?.email === param.mail)
-  console.log('tempppAcc', tempAccount)
 
   return (
     <section className="overflow-y-hidden">

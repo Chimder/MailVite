@@ -4,9 +4,9 @@ import Cookies from 'js-cookie'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
-import Spinner from '../../spiner'
+import { resetGmailSession } from '../../../hooks/google'
+import Spinner from '../../ui/spiner'
 import { decrypt, encrypt } from './options'
-import { resetGmailSession } from './query'
 import { GoogleAccount } from './types'
 
 const GoogleCallBack = () => {

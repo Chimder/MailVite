@@ -1,0 +1,191 @@
+.mainWrap {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 100vh;
+  padding-top: 6.8vh;
+  background-color: var(--background);
+
+  @media (width <= 1023px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.navTempWrap {
+  display: flex;
+  flex-direction: column;
+  grid-column: span 2 / span 2;
+  align-items: center;
+  justify-content: center;
+  padding-left: 12vw;
+
+  @media (width <= 1535px) {
+    padding-left: 6vw;
+  }
+
+  @media (width <= 1279px) {
+    padding-left: 0;
+  }
+
+  @media (width <= 1023px) {
+    grid-column: span 1 / span 1;
+    padding-left: 0;
+
+    &.message {
+      display: none;
+    }
+  }
+}
+
+.navTemp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 6px 0;
+
+  @media (width <= 1023px) {
+    flex-direction: column;
+  }
+}
+
+.mailButt {
+  @media (width <= 1023px) {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+
+  .copy {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scaleX(1.1) scaleY(1.1);
+    }
+  }
+}
+
+.cursor {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &.fetch {
+    animation: spin 1s linear infinite;
+  }
+}
+
+.messageList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  width: 100%;
+  height: 87vh;
+  padding: 0;
+  margin: 0;
+  overflow: hidden scroll;
+}
+
+.messageWrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-left: 0;
+  margin-left: 0;
+  cursor: pointer;
+
+  &:hover {
+    background: #000000;
+  }
+
+  .select {
+    background: #583333;
+  }
+}
+
+.message {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 100%;
+
+  &:first-child {
+    border-top: 1px blue dashed; // Верхняя граница только у первого элемента
+  }
+
+  &:not(:first-child) {
+    border-bottom: 1px blue dashed; // Нижняя граница у всех остальных
+  }
+
+  &:last-child {
+    border-bottom: none; // Убираем нижнюю границу у последнего элемента
+  }
+}
+
+.readIcon {
+  width: 24px;
+  height: 24px;
+  padding-right: 2px;
+  color: orange;
+
+  // background-color: orange;
+}
+
+.messageInfoWrap {
+  width: 100%;
+}
+
+.messageInfo {
+  display: flex;
+  justify-content: space-between;
+
+  .name {
+    display: flex;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .time {
+    padding-right: 4px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .sub {
+    display: -webkit-box;
+    width: 100%;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+
+  .info {
+    display: -webkit-box;
+    width: 100%;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}

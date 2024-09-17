@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { queryClient } from '@/app/providers'
+import { queryClient } from '@/app/providers/providers'
 
-import { getTempSession } from './options'
+import { getTempSession } from '../components/auth/temp/options'
 
 export function useTempSession() {
   return useQuery({

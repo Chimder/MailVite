@@ -3,8 +3,8 @@ import Cookies from 'js-cookie'
 import { redirect } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
+import { resetTempSession } from '../../../hooks/temp'
 import { decrypt, encrypt } from '../google/options'
-import { resetTempSession } from './query'
 import { TempAccount, TempMess } from './types'
 
 export async function getTempSession(): Promise<TempAccount[] | null> {

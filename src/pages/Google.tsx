@@ -1,8 +1,8 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
-import { useGmailSession } from '@/components/auth/google/query'
-import Gmail from '@/components/Gmail'
+import { useGmailSession } from '@/hooks/google'
+import Gmail from '@/components/Google/Gmail'
 
 export default function Google() {
   const param = useParams()
