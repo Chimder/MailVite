@@ -163,7 +163,7 @@ export default function Gmail({ accountData }: Props) {
               </div>
             ))}
           <div>
-            {!isFetchingNextPage && <RotateCw className={s.isFetchSpin} />}
+            {isFetchingNextPage && <RotateCw className={s.isFetchSpin} />}
           </div>
         </div>
       </section>
