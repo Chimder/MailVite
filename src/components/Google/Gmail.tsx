@@ -95,7 +95,7 @@ export default function Gmail({ accountData }: Props) {
   const { ref, inView } = useInView()
   useEffect(() => {
     if (inView && hasNextPage) {
-      // fetchNextPage()
+      fetchNextPage()
     }
   }, [inView])
 
