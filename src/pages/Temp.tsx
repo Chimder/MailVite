@@ -9,8 +9,6 @@ export default function Temp() {
   const tempAccount = googleSession?.find(acc => acc?.email === param.mail)
 
   return (
-    <section className="overflow-y-hidden">
-      {tempAccount && <TempMail accountData={tempAccount} />}
-    </section>
+    <section>{tempAccount && <TempMail accountData={tempAccount} />}</section>
   )
 }

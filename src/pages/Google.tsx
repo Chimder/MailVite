@@ -11,7 +11,7 @@ export default function Google() {
   const gmailAccount = googleSession?.find(acc => acc?.email === param.mail)
 
   return (
-    <section className="overflow-y-hidden">
+    <section >
       {gmailAccount && <Gmail accountData={gmailAccount} />}
     </section>
   )

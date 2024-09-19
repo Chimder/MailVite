@@ -15,16 +15,10 @@
   --muted-foreground: hsl(0deg 0% 63.9%);
   --accent: hsl(0deg 0% 14.9%);
   --accent-foreground: hsl(0deg 0% 98%);
-  --destructive: hsl(0deg 62.8% 30.6%);
+  --destructive: 0deg 62.8% 30.6%;
   --destructive-foreground: hsl(0deg 0% 98%);
   --border: hsl(0deg 0% 14.9%);
   --input: hsl(0deg 0% 14.9%);
   --ring: hsl(0deg 0% 83.1%);
-
-  // Screen size variables
-  --screen-2xl: 1535px;
-  --screen-xl: 1279px;
-  --screen-lg: 1023px;
-  --screen-md: 767px;
-  --screen-sm: 639px;
+  --border-mess: #38bdf8;
 }

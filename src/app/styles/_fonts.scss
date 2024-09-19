@@ -1,7 +1,7 @@
 @font-face {
-  font-family: "__GGSANS";
+  font-family: '__GGSANS';
   font-weight: 700;
-  src: url("/fonts/ggsans-Bold.woff2") format('woff2');
+  src: url('/fonts/ggsans-Bold.woff2') format('woff2');
   font-display: swap;
 }
 
@@ -19,7 +19,6 @@
   font-display: swap;
 }
 
-
 @font-face {
   font-family: "__GGSANS";
   font-weight: 400;
@@ -27,9 +26,6 @@
   font-display: swap;
 }
 
-
-
-
 html {
-  font-family: "__GGSANS", sans-serif,monospace;
+  font-family: '__GGSANS', sans-serif, monospace;
 }

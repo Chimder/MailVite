@@ -65,7 +65,7 @@ export default function TempMail({ accountData }: Props) {
 
   return (
     <div className={s.mainWrap}>
-      <section className={clsx(s.navTempWrap, messageId && s.message)}>
+      <section className={clsx(s.navTempWrap, messageId && s.messageId)}>
         <div className={s.navTemp}>
           <Button className={s.mailButt}>{accountData.email}</Button>
           <div className={s.panel}>
@@ -111,29 +111,16 @@ export default function TempMail({ accountData }: Props) {
         </div>
       </section>
 
-      <section
-        className={`relative col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden overflow-y-hidden xl:col-span-3 ${messageId ? 'lg:col-span-1' : 'lg:hidden'}`}
-      >
-        <div className="relative lg:py-4">
+      <section className={clsx(s.tempMailWrap, messageId && s.active)}>
+        <div className={s.tempMail}>
           {messBody && (
-            <div className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden">
-              <Button
-                className="w-[60vw]"
-                onClick={() => setMessBody(undefined)}
-              >
-                Назад
-              </Button>
+            <div className={s.backButt}>
+              <Button onClick={() => setMessBody(undefined)}>Back</Button>
             </div>
           )}
         </div>
-        <div className="h-full max-h-screen w-full overflow-auto">
-          {messBody && (
-            <iframe
-              key={messBody.id}
-              className="flex h-full w-full flex-col items-center justify-center overflow-x-hidden font-sans"
-              srcDoc={messBody.html[0]}
-            />
-          )}
+        <div className={s.tempBody}>
+          {messBody && <iframe key={messBody.id} srcDoc={messBody.html[0]} />}
         </div>
       </section>
     </div>

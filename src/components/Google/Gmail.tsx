@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Button } from '@radix-ui/themes'
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
+import clsx from 'clsx'
 import { LogOut, RotateCw, Tally1, Tally2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
@@ -14,7 +16,7 @@ import {
 import { GoogleAccount, mailDatas } from '../auth/google/types'
 import CopyMail from '../copy'
 import Spinner from '../ui/spiner'
-import { Button } from '@radix-ui/themes'
+import s from './gmailx.module.scss'
 
 type Props = {
   accountData: GoogleAccount
@@ -36,6 +38,7 @@ export default function Gmail({ accountData }: Props) {
     )
     return response
   }
+
   const {
     data: mailData,
     fetchNextPage,
@@ -92,7 +95,7 @@ export default function Gmail({ accountData }: Props) {
   const { ref, inView } = useInView()
   useEffect(() => {
     if (inView && hasNextPage) {
-      fetchNextPage()
+      // fetchNextPage()
     }
   }, [inView])
 
@@ -107,100 +110,78 @@ export default function Gmail({ accountData }: Props) {
   }
 
   return (
-    <div className="grid h-[100vh] grid-cols-5 bg-background pt-[6.8vh] lg:grid-cols-1">
-      <section
-        className={`col-span-2 flex flex-col items-center justify-start pl-[12vw] 2xl:pl-[6vw]
-        xl:pl-0 lg:col-span-1 ${selectedMessage && 'lg:hidden'}`}
-      >
-        <div className="my-2 flex w-full items-center  justify-evenly xl:flex-col">
-          <Button className="xl:mb-1 xl:w-full">{accountData.email}</Button>
-          <div className="flex w-full  items-center justify-evenly">
-            <div className="cursor-pointer hover:scale-110">
+    <div className={s.gmailContainer}>
+      <section className={clsx(s.leftPanel, selectedMessage && s.messageId)}>
+        <div className={s.navTemp}>
+          <Button className={s.mailButt}>{accountData.email}</Button>
+          <div className={s.panel}>
+            <div className={s.copy}>
               <CopyMail mail={accountData.email} />
             </div>
             <RotateCw
               onClick={() => refetch()}
-              className={`cursor-pointer hover:scale-110 ${isFetching && !isFetchingNextPage ? 'animate-spin' : ''}`}
+              className={clsx(
+                s.cursor,
+                isFetching && !isFetchingNextPage && s.fetch,
+              )}
             />
             <LogOut
-              className="cursor-pointer hover:scale-110"
+              className={s.cursor}
               onClick={() => deleteMail(accountData?.email)}
             />
           </div>
         </div>
-        <div
-          className="m-0 flex h-[87vh] w-full  flex-col items-center justify-start overflow-x-hidden
-             overflow-y-scroll p-0"
-        >
+        <div className={s.messageList}>
           {mailDatas &&
             mailDatas?.map((mess, i) => (
               <div
                 ref={ref}
                 key={`${mess.snippet} + ${i}`}
-                className={`ml-0 flex w-full cursor-pointer justify-center !pl-0 hover:bg-slate-500/25
-                           ${selectedMessage?.messageId == mess?.messageId ? 'bg-slate-500/25' : ''}`}
+                className={clsx(
+                  s.messageWrap,
+                  selectedMessage?.messageId == mess?.messageId && s.select,
+                )}
                 onClick={() => chooseMessage(mess)}
               >
-                <div className="flex w-full items-center justify-start divide-y divide-dashed divide-blue-200">
+                <div className={s.message}>
                   <div>
                     {mess?.isUnread ? (
-                      <Tally2 className="h-6 w-6 pr-1 text-sky-600" />
+                      <Tally2 className={s.notReadIcon} />
                     ) : (
-                      <Tally1 className="h-6 w-6 text-orange-500" />
+                      <Tally1 className={s.readIcon} />
                     )}
                   </div>
-                  <div className="w-full">
-                    <div className="flex justify-between">
-                      <div className="flex text-base">{mess?.from}</div>
-                      <div className="text-s pr-1">{mess?.date}</div>
+                  <div className={s.messageInfoWrap}>
+                    <div className={s.messageInfo}>
+                      <div className={s.name}>{mess?.from}</div>
+                      <div className={s.time}>{mess?.date}</div>
                     </div>
-                    <div className="line-clamp-1 w-full overflow-hidden text-ellipsis text-sm">
-                      {mess?.subject}
-                    </div>
-                    <div className="line-clamp-2 w-full text-sm ">
-                      {mess?.snippet}
-                    </div>
+                    <div className={s.sub}>{mess?.subject}</div>
+                    <div className={s.info}>{mess?.snippet}</div>
                   </div>
                 </div>
               </div>
             ))}
           <div>
-            {isFetchingNextPage && <RotateCw className="my-1  animate-spin " />}
+            {!isFetchingNextPage && <RotateCw className={s.isFetchSpin} />}
           </div>
         </div>
       </section>
 
-      <section
-        className={`relative col-span-3 flex w-full flex-col items-center justify-center overflow-x-hidden
-        overflow-y-hidden xl:col-span-3 ${selectedMessage ? 'lg:col-span-1' : 'lg:hidden'}`}
-      >
-        <div className="relative lg:py-4">
+      <section className={clsx(s.rightPanel, selectedMessage && s.active)}>
+        <div className={s.bodyWrap}>
           {selectedMessage && (
-            <div
-              className="hidden lg:col-span-4 lg:flex lg:w-full lg:flex-col lg:items-center
-            lg:justify-center lg:overflow-x-hidden lg:overflow-y-hidden"
-            >
-              <Button
-                className="w-[60vw]"
-                onClick={() => setSelectedMessage(null)}
-              >
-                Back
-              </Button>
+            <div className={s.backButt}>
+              <Button onClick={() => setSelectedMessage(null)}>Back</Button>
             </div>
           )}
         </div>
-        <div className=" h-full max-h-screen w-full overflow-auto">
+        <div className={s.bodyData}>
           {selectedMessage?.bodyData &&
           /<[a-z][\s\S]*>/i.test(selectedMessage?.bodyData) ? (
-            <iframe
-              className="flex h-full w-full items-center justify-center overflow-x-hidden font-sans"
-              srcDoc={selectedMessage?.bodyData}
-            />
+            <iframe srcDoc={selectedMessage?.bodyData} />
           ) : (
-            <div
-              className=" flex w-full flex-col items-center justify-center whitespace-pre-wrap px-4"
-              key={selectedMessage?.bodyData}
-            >
+            <div className={s.notBodyData} key={selectedMessage?.bodyData}>
               {selectedMessage?.bodyData}
             </div>
           )}

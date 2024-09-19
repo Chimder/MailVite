@@ -1,0 +1,21 @@
+.spinContainer {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.spinIcon {
+  width: 8rem;
+  height: 8rem;
+  color: #38bdf8;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

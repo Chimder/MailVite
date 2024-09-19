@@ -1,9 +1,10 @@
+import clsx from 'clsx'
 import { CirclePlus } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
 import { useGmailSession } from '../../hooks/google'
 import { useTempSession } from '../../hooks/temp'
-import { ThemeToggle } from '../ui/themeToggle'
+import s from './main.module.scss'
 
 export const MainLayout = () => {
   const { data: googleSession } = useGmailSession()
@@ -13,41 +14,33 @@ export const MainLayout = () => {
   const limit = (googleSession?.length || 0) + (tempSession?.length || 0) === 6
 
   return (
-    <nav className="nav_bar_container nav_color dark:nav_color_dark ">
-      <div className="z-100 flex w-full justify-evenly">
+    <nav className={clsx(s.Container, s.navColor)}>
+      <div className={s.main}>
         {googleSession?.map((email, i) => (
           <Link
-            className={`${path.mail == email.email ? 'nav_icon_active' : 'nav_icon'}`}
+            className={clsx(s.navIcon, path.mail == email.email && s.active)}
             to={`/google/${email.email}`}
             key={email.providerAccountId}
           >
-            <img
-              className="h-10 w-10 rounded-full"
-              src={email.picture}
-              alt=""
-            />
+            <img src={email.picture} alt="" />
           </Link>
         ))}
         {tempSession?.map((email, i) => (
           <Link
-            className={`${path.mail == email.email ? 'nav_icon_active' : 'nav_icon'}`}
+            className={clsx(s.navIcon, path.mail == email.email && s.active)}
             to={`/temp/${email.email}`}
             key={email.email}
           >
-            <img
-              className="h-10 w-10 rounded-full"
-              src="/Logo/MailTm_Logo.webp"
-              alt=""
-            />
+            <img src="/Logo/MailTm_Logo.webp" alt="" />
           </Link>
         ))}
 
         {!limit && (
-          <Link to="/">
-            <CirclePlus className="h-10 w-10"></CirclePlus>
+          <Link className={s.themeButt} to="/">
+            <CirclePlus ></CirclePlus>
           </Link>
         )}
-        <ThemeToggle />
+        {/* <ThemeToggle /> */}
       </div>
     </nav>
   )
