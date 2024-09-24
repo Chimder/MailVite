@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
@@ -43,6 +43,8 @@
   },
   "devDependencies": {
     "@csstools/postcss-global-data": "^3.0.0",
+    "@rsbuild/core": "^1.0.6",
+    "@rsbuild/plugin-react": "^1.0.2",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.6",
@@ -60,6 +62,7 @@
     "postcss": "^8.4.47",
     "postcss-custom-media": "^11.0.1",
     "postcss-import": "^16.1.0",
+    "postcss-loader": "^8.1.1",
     "postcss-mixins": "^11.0.1",
     "postcss-nested": "^6.2.0",
     "postcss-preset-env": "^10.0.5",
@@ -70,8 +73,6 @@
     "stylelint-order": "^6.0.4",
     "stylelint-scss": "^6.6.0",
     "stylelint-use-nesting": "^6.0.0",
-    "tailwindcss": "^3.4.11",
-    "typescript": "^5.6.2",
-    "vite": "^5.4.5"
+    "typescript": "^5.6.2"
   }
 }
