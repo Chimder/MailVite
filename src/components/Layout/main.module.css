@@ -1,11 +1,9 @@
 .Container {
+  @mixin center;
   position: fixed;
   top: 32px;
   left: 50%;
   z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   max-width: 780px;
   height: 100%;
@@ -30,12 +28,10 @@
 
 .containerM {
   padding: 0 10vw;
-
-  @media (width <= 1023px) {
+  @media (--lg) {
     padding: 0;
   }
-
-  @media (width <= 1279px) {
+  @media (--xl) {
     padding: 0 3vw;
   }
 }
@@ -49,12 +45,10 @@
 }
 
 .navIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 1px 10px;
   cursor: pointer;
   border-radius: 5px;
+  @mixin center;
 
   &:hover {
     background-color: hsl(var(--secondary));

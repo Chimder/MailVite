@@ -16,7 +16,7 @@ import {
 import { GoogleAccount, mailDatas } from '../auth/google/types'
 import CopyMail from '../copy'
 import Spinner from '../ui/spiner'
-import s from './gmailx.module.scss'
+import s from './gmailx.module.css'
 
 type Props = {
   accountData: GoogleAccount

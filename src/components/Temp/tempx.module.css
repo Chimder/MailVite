@@ -5,28 +5,26 @@
   padding-top: 6.8vh;
   background-color: var(--background);
 
-  @media (width <= 1023px) {
+  @media (--lg) {
     grid-template-columns: 1fr;
   }
 }
 
 .navTempWrap {
-  display: flex;
+  @mixin center;
   flex-direction: column;
   grid-column: span 2 / span 2;
-  align-items: center;
-  justify-content: center;
   padding-left: 12vw;
 
-  @media (width <= 1535px) {
+  @media (--xxl) {
     padding-left: 6vw;
   }
 
-  @media (width <= 1279px) {
+  @media (--xl) {
     padding-left: 0;
   }
 
-  @media (width <= 1023px) {
+  @media (--lg) {
     grid-column: span 1 / span 1;
     padding-left: 0;
 
@@ -37,13 +35,11 @@
 }
 
 .navTemp {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @mixin center;
   width: 100%;
   margin: 6px 0;
 
-  @media (width <= 1023px) {
+  @media (--lg) {
     flex-direction: column;
   }
 }
@@ -52,7 +48,7 @@
   padding: 6px;
   margin: 2px;
 
-  @media (width <= 1023px) {
+  @media (--lg) {
     width: 100%;
     margin-bottom: 4px;
   }
@@ -195,7 +191,7 @@
     opacity 0.3s ease,
     visibility 0.3s ease;
 
-  @media (width <= 1023px) {
+  @media (--lg) {
     position: absolute;
     pointer-events: none;
     visibility: hidden;
@@ -214,7 +210,7 @@
 .tempMail {
   position: relative;
 
-  @media (width <=1023px) {
+  @media (--lg) {
     padding: 16px 0;
   }
 }
@@ -222,12 +218,10 @@
 .backButt {
   display: none;
 
-  @media (width <=1023px) {
-    display: flex;
+  @media (--lg) {
+    @mixin center;
     flex-direction: column;
     grid-column: span 4 / span 4;
-    align-items: center;
-    justify-content: center;
     width: 100%;
     padding: 10px 0;
     overflow: hidden;
@@ -253,10 +247,8 @@
   overflow: auto;
 
   iframe {
-    display: flex;
+    @mixin center;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     width: 100%;
     height: 100%;
     overflow-x: hidden;

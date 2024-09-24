@@ -1,6 +1,6 @@
 import Icon from '@/shared/assets/Icon'
 import { GoogleLoginURL } from '@/shared/lib/constants'
-import { Button, Card, Skeleton, TextArea } from '@radix-ui/themes'
+import { Button} from '@radix-ui/themes'
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 
@@ -8,9 +8,9 @@ import { useGmailSession } from '@/hooks/google'
 import { useTempSession } from '@/hooks/temp'
 import { regTempEmailAccount } from '@/components/auth/temp/options'
 
-import s from './homex.module.scss'
+import s from './homex.module.css'
 
-export default function Home() {
+export function Home() {
   const { data: googleSession } = useGmailSession()
   const { data: tempSession } = useTempSession()
 

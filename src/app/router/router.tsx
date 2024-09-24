@@ -1,8 +1,4 @@
-import { lazy } from 'react'
-import Google from '@/pages/Google'
-import Home from '@/pages/Home'
-import Temp from '@/pages/Temp'
-import { createBrowserRouter, Navigate, redirect, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import GoogleCallBack from '@/components/auth/google/callback'
 
@@ -15,31 +11,32 @@ export default function Routes() {
       children: [
         {
           path: '/',
-          element: <Home />,
+          // element: <Home />,
+          async lazy() {
+            let { Home } = await import('../../pages/Home')
+            return { Component: Home }
+          },
         },
         {
           path: '/google/:mail',
-          element: <Google />,
+          // element: <Google />,
+          async lazy() {
+            let { Google } = await import('../../pages/Google')
+            return { Component: Google }
+          },
         },
         {
           path: '/temp/:mail',
-          element: <Temp />,
+          // element: <Temp />,
+          async lazy() {
+            let { Temp } = await import('../../pages/Temp')
+            return { Component: Temp }
+          },
         },
         {
           path: '/google/auth/*',
           element: <GoogleCallBack />,
         },
-        // {
-        //   path: PATH.STREAMER,
-        //   element: <Steamer />,
-        //   loader: async ({ params }) => {
-        //     const [user, emotes] = await Promise.all([
-        //       getUserById(params?.id),
-        //       getEmotes(params?.id),
-        //     ]);
-        //     return { user, emotes };
-        //   },
-        // },
       ],
     },
   ])

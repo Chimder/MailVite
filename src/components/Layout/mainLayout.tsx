@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 
 import { useGmailSession } from '../../hooks/google'
 import { useTempSession } from '../../hooks/temp'
-import s from './main.module.scss'
+import s from './main.module.css'
 
 export const MainLayout = () => {
   const { data: googleSession } = useGmailSession()

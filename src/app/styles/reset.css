@@ -69,7 +69,7 @@ canvas {
 }
 
 input,
-// button,
+/* button, */
 textarea,
 select {
   font-family: inherit;

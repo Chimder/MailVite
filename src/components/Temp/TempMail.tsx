@@ -17,7 +17,7 @@ import {
 import { HydraMember, TempAccount } from '../auth/temp/types'
 import CopyMail from '../copy'
 import Spinner from '../ui/spiner'
-import s from './tempx.module.scss'
+import s from './tempx.module.css'
 
 type Props = {
   accountData: TempAccount

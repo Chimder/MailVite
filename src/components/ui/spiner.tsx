@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCw } from 'lucide-react'
 
-import s from './uix.module.scss'
+import s from './uix.module.css'
 
 export default function Spinner() {
   return (

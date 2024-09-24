@@ -6,23 +6,23 @@
 }
 
 @font-face {
-  font-family: "__GGSANS";
+  font-family: '__GGSANS';
   font-weight: 600;
-  src: url("/fonts/ggsans-Semibold.woff2") format('woff2');
+  src: url('/fonts/ggsans-Semibold.woff2') format('woff2');
   font-display: swap;
 }
 
 @font-face {
-  font-family: "__GGSANS";
+  font-family: '__GGSANS';
   font-weight: 500;
-  src: url("/fonts/ggsans-Medium.woff2") format('woff2');
+  src: url('/fonts/ggsans-Medium.woff2') format('woff2');
   font-display: swap;
 }
 
 @font-face {
-  font-family: "__GGSANS";
+  font-family: '__GGSANS';
   font-weight: 400;
-  src: url("/fonts/ggsans-Normal.woff2") format('woff2');
+  src: url('/fonts/ggsans-Normal.woff2') format('woff2');
   font-display: swap;
 }
 
