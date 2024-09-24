@@ -1,34 +1,27 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 export const formatDate = (dateString: string): string => {
-  const date = moment(dateString, 'ddd, D MMM YYYY HH:mm:ss ZZ')
+  const date = dayjs(dateString, 'ddd, D MMM YYYY HH:mm:ss ZZ')
 
-  if (moment().isSame(date, 'day')) {
-    // Если письмо пришло сегодня, показывать время
+  if (dayjs().isSame(date, 'day')) {
     return date.format('HH:mm')
-  } else if (moment().isSame(date, 'week')) {
-    // Если письмо пришло на этой неделе, показывать день недели
+  } else if (dayjs().isSame(date, 'week')) {
     return date.format('ddd')
-  } else if (moment().isSame(date, 'year')) {
-    // Если письмо попадает в текущий год, показывать месяц и дату
+  } else if (dayjs().isSame(date, 'year')) {
     return date.format('MMM D')
   } else {
-    // Если письмо не попадает в текущий год, показывать месяц и год
     return date.format('MMM YYYY')
   }
 }
 
 export const formatTempDate = (dateString: string): string => {
-  const date = moment(dateString)
+  const date = dayjs(dateString)
 
-  if (moment().isSame(date, 'day')) {
-    // Если письмо пришло сегодня, показывать время
+  if (dayjs().isSame(date, 'day')) {
     return date.format('HH:mm')
-  } else if (moment().isSame(date, 'day')) {
-    // Если письмо было получено вчера, показывать день недели и время
+  } else if (dayjs().isSame(dayjs().subtract(1, 'day'), 'day')) {
     return date.format('ddd HH:mm')
   } else {
-    // В других случаях отобразить полную дату и время
     return date.format('MMM D, YYYY HH:mm')
   }
 }
