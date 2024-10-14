@@ -1,5 +1,3 @@
-/* @import '../../app/styles/mixins.css'; */
-
 .gmailContainer {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -241,7 +239,7 @@
     visibility: hidden;
     opacity: 0;
 
-    @media (width <= 1023px) {
+    @media (--lg) {
       @mixin center;
       position: absolute;
       width: 100%;

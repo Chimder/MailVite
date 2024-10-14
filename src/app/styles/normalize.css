@@ -5,8 +5,9 @@
 }
 
 html {
-  text-size-adjust: none;
+  font-family: '__GGSANS', sans-serif;
   background-color: var(--background);
+  text-size-adjust: none;
 }
 
 body,

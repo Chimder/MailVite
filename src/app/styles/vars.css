@@ -22,9 +22,3 @@
   --ring: hsl(0deg 0% 83.1%);
   --border-mess: #38bdf8;
 }
-
-@custom-media --xxl (max-width: 1535px);
-@custom-media --xl (max-width: 1279px);
-@custom-media --lg (max-width: 1023px);
-@custom-media --md (max-width: 767px);
-@custom-media --sm (max-width: 639px);

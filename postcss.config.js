@@ -2,7 +2,7 @@ export default {
   plugins: {
     'postcss-import': {},
     '@csstools/postcss-global-data': {
-      files: ['./src/app/styles/vars.css'],
+      files: ['./src/app/styles/vars.css', './src/app/styles/media.css'],
     },
     'postcss-mixins': {
       mixinsFiles: ['./src/app/styles/mixins.css'],

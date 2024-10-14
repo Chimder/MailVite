@@ -1,5 +1,6 @@
-@import 'vars';
-@import 'mixins';
 @import 'fonts';
-@import 'reset';
 @import 'globals';
+@import 'media';
+@import 'mixins';
+@import 'normalize';
+@import 'vars';
