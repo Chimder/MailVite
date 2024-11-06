@@ -31,7 +31,7 @@ export default function Gmail({ accountData }: Props) {
   const [mailDatas, setMailDatas] = useState<mailDatas[]>([])
 
   const fetchMessPages = async ({ pageParam }: { pageParam?: number }) => {
-    const response: any = await getMessagesAndContent(
+    const response = await getMessagesAndContent(
       accountData?.accessToken,
       accountData?.refreshToken,
       pageParam,
@@ -64,7 +64,7 @@ export default function Gmail({ accountData }: Props) {
 
   useEffect(() => {
     if (mailData) {
-      const messages = mailData.pages.flatMap(page => page?.messagesData)
+      const messages = mailData.pages.flatMap(page => page?.messagesData) as mailDatas[]
       setMailDatas(messages)
     }
   }, [mailData])
